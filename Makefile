@@ -8,10 +8,10 @@ LDIR =./lib
 
 LIBS=-lm -lproj -lshp
 
-_DEPS = mesh.h shapes.h types.h
+_DEPS = mesh.h shapes.h types.h ttt.h ttm.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = tttm.o mesh.o shapes.o
+_OBJ = main.o mesh.o shapes.o ttt.o ttm.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
