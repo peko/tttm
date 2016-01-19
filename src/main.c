@@ -1,5 +1,4 @@
 /*
-
     1) Load shape
     2) Reproject
     3) Save poly
@@ -8,6 +7,25 @@
     6) Remesh with tetra triangles
     7) Save ply mesh
 
+    point
+       x, y
+
+    triangle
+       points a, b, c
+    
+    mesh
+       points
+       triangles
+
+    tetra triangle
+       triangle
+       children
+          t1, t2, t3, t4
+
+    ttm - tetra tree mesh
+       points
+       levels
+          tetra triangles
 */
 
 #include <stdlib.h>
@@ -66,4 +84,5 @@ usage:
     printf("Usage:\n");
     printf("shape_mesher meshfile\n");
     exit(EXIT_FAILURE);
- }
+
+}

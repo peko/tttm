@@ -6,7 +6,6 @@ typedef struct pnt {
     double y;
 } pnt;
 
-
 typedef struct tri {
     int a;
     int b;

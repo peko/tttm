@@ -10,6 +10,21 @@
 
 #define SQRT3 1.73205080757
 
+mesh* mesh_init() {
+    mesh* msh = malloc(sizeof(mesh));
+    kv_init(msh->points);
+    kv_init(msh->triangles);
+    msh->min = (pnt){DBL_MAX, DBL_MAX};
+    msh->max = (pnt){DBL_MIN, DBL_MIN};
+    return msh;
+}
+
+void mesh_free(mesh *msh) {
+    kv_destroy(msh->triangles);
+    kv_destroy(msh->points);
+    free(msh);
+}
+
 ///////////////
 // MESH POLY //
 ///////////////
@@ -32,8 +47,7 @@ void mesh_poly_file(char* name) {
 
 mesh* mesh_load(char* name) {
 
-    mesh* msh = malloc(sizeof(mesh));
-    *msh = (mesh){0, 0, (pnt){DBL_MAX, DBL_MAX}, (pnt){DBL_MIN, DBL_MIN}, NULL, NULL};
+    mesh* msh = mesh_init();
 
     char file_name[256];
 
@@ -56,26 +70,28 @@ mesh* mesh_load(char* name) {
     
     // get header    
     read = getline(&line, &len, f);
-    msh->points_count = atoi(line);
+    int points_count = atoi(line);
 
     printf("count: %d\n", msh->points_count);
-    msh->points = malloc(msh->points_count * sizeof(pnt));
+    // msh->points = malloc(msh->points_count * sizeof(pnt));
 
     int index = -1;
     int i = 0;
-
     
-    while(i++ < msh->points_count && (read = getline(&line, &len, f)) != -1) {
+    while(i++ < points_count && (read = getline(&line, &len, f)) != -1) {
         char* t;
+        
         // get index
         t = strtok(line, " ");
         index = atoi(t);
+        pnt p = {0.0, 0.0};
         // get x
         t = strtok(NULL, " ");
-        msh->points[index].x = atof(t);
+        p.x = atof(t);
         // get y
         t = strtok(NULL, " ");
-        msh->points[index].y = atof(t);
+        p.y = atof(t);
+        kv_push(pnt, msh->points, p);
 
         if(msh->min.x > msh->points[index].x) msh->min.x = msh->points[index].x;
         if(msh->min.y > msh->points[index].y) msh->min.y = msh->points[index].y;
@@ -107,9 +123,11 @@ mesh* mesh_load(char* name) {
         // get index
         t = strtok(line, " ");
         index = atoi(t);
-        t = strtok(NULL, " "); msh->triangles[index].a = atoi(t);
-        t = strtok(NULL, " "); msh->triangles[index].b = atoi(t);
-        t = strtok(NULL, " "); msh->triangles[index].c = atoi(t);
+        tri tr = {0, 0, 0};
+        t = strtok(NULL, " "); tr.a = atoi(t);
+        t = strtok(NULL, " "); tr.b = atoi(t);
+        t = strtok(NULL, " "); tr.c = atoi(t);
+        kv_push(tri, msh->triangles, tr);
     }
     fclose(f);
     
@@ -166,22 +184,6 @@ void mesh_save_ply(mesh* msh, double lng, double lat, double zoom) {
 
     fclose(f);    
 }
-
-void mesh_free(mesh* msh) {
-
-    // free(mesh_X); mesh_X = NULL;
-    // free(mesh_Y); mesh_Y = NULL;
-
-    // free(mesh_pr_X); mesh_pr_X = NULL; 
-    // free(mesh_pr_Y); mesh_pr_Y = NULL;
-
-    // free(msh->triangles); msh->triangles = NULL;
-
-    free(msh->triangles);
-    free(msh->points);
-    free(msh);
-}
-
 
 // static int check_intersection(tri t) {
 //     int intersects = 0;

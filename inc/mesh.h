@@ -10,18 +10,15 @@
 
 typedef struct mesh {
 
-    int  points_count;
-    int  triangles_count;
-    
     pnt max, min;
 
-    pnt *points;
-    tri *triangles;
+    kvec_t(pnt) points;
+    kvec_t(tri) triangles;
 
 } mesh;
 
-
 mesh* mesh_load(char* name);
+mesh* mesh_init();
 
 void mesh_poly_file(char* name);
 void mesh_save_ply (mesh* msh, double lng, double lat, double zoom);

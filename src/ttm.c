@@ -3,10 +3,12 @@
 /////////////////////
 
 #include "ttm.h"
+#include "mesh.h"
 
-ttm* ttm_init(mesh* msh) {
-    
+ttm* ttm_init(pnt p, float r) {
+
     double w, h, r;
+
     w = msh->max.x - msh->min.x;
     h = msh->max.y - msh->min.y;
     r = sqrt(w*w+h*h)/2.0;
@@ -19,7 +21,19 @@ ttm* ttm_init(mesh* msh) {
 }
 
 void ttm_subdivide(ttm *tm){
+    // run through current level
+    // split triangles
 }
+
+void ttm_subdivide_by_mesh(ttm *tm, mesh *m) {
+    // run through current level
+    // split triangles intersected with m
+}
+
+void ttm_free(ttm *tmsh) {
+}
+
+/// EXPORT /// 
 
 void ttm_save_ply(ttm *tm, char *name) {
     
@@ -42,10 +56,10 @@ void ttm_save_ply(ttm *tm, char *name) {
     fprintf(f, "property list uchar int vertex_indices\n");
     fprintf(f, "end_header\n");
 
+    // save here
+
     fclose(f);    
 
 }
 
-void ttm_free(ttm *tmsh) {
-}
 
