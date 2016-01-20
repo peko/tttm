@@ -35,6 +35,7 @@
 
 #include "shapes.h"
 #include "mesh.h"
+#include "ttm.h"
 
 static void parse_params(int argc, char** argv);
 
@@ -57,15 +58,25 @@ int main(int argc, char** argv) {
         // MESH WITH TRIANGLE
         mesh_poly_file(shp->name_long[s]);
         // LOAD MESH
-        mesh  *msh  = mesh_load(shp->name_long[s]);
-        tmesh *tmsh = tmesh_init(msh);
-        tmesh_subdivide(tmsh);
-        tmesh_subdivide(tmsh);
-        tmesh_subdivide(tmsh);
-        tmesh_save_ply(tmsh, shp->name_long[s]);
+        mesh *msh  = mesh_load(shp->name_long[s]);
+        
+        float w = msh->max.x - msh->min.x;
+        float h = msh->max.y - msh->min.y;
+        float r = sqrt(w*w+h*h)/2.0;
+        pnt c = {msh->min.x+w/2.0,msh->min.y+h/2.0};
+        ttm *tmsh = ttm_init(c, r);
+        
+        // tmesh_subdivide(tmsh);
+        // tmesh_subdivide(tmsh);
+        // tmesh_subdivide(tmsh);
+        // tmesh_save_ply(tmsh, shp->name_long[s]);
         // mesh_save_sphere_ply(shape_name_long[s], shape_cxX[s], shape_cxY[s], zoom);
         // mesh_regular_triangle_fill(shape_name_long[s]);
+
+        ttm_free(tmsh);
         mesh_free(msh);
+
+        break;
     }
 
     shapes_free(shp);

@@ -5,7 +5,12 @@
 #ifndef TTM_INCLUDE
 #define TTM_INCLUDE
 
-typedef sturct mesh mesh;
+#include "types.h"
+#include "kvec.h"
+
+typedef struct mesh mesh;
+typedef struct pnt pnt;
+typedef struct ttt ttt;
 
 typedef struct ttm {
     kvec_t(pnt)  points;     // points

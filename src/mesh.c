@@ -34,7 +34,7 @@ void mesh_free(mesh *msh) {
 void mesh_poly_file(char* name) { 
     char cmd[256];
     // sprintf(cmd, "./triangle -pzq32.5a.001 \"../mesh/%s.poly\"", name);
-    sprintf(cmd, "./triangle -pz \"../mesh/%s.poly\"", name);
+    sprintf(cmd, "./triangle -pz \"mesh/%s.poly\"", name);
     printf("%s\n", cmd);
     system(cmd);
 }
@@ -62,7 +62,7 @@ mesh* mesh_load(char* name) {
 
     // POINTS //
 
-    sprintf(file_name, "../mesh/%s.1.node", name);
+    sprintf(file_name, "mesh/%s.1.node", name);
     printf("\tLoad points %s", file_name);
 
     f = fopen(file_name, "r");
@@ -72,7 +72,7 @@ mesh* mesh_load(char* name) {
     read = getline(&line, &len, f);
     int points_count = atoi(line);
 
-    printf("count: %d\n", msh->points_count);
+    printf("count: %d\n", points_count);
     // msh->points = malloc(msh->points_count * sizeof(pnt));
 
     int index = -1;
@@ -93,10 +93,10 @@ mesh* mesh_load(char* name) {
         p.y = atof(t);
         kv_push(pnt, msh->points, p);
 
-        if(msh->min.x > msh->points[index].x) msh->min.x = msh->points[index].x;
-        if(msh->min.y > msh->points[index].y) msh->min.y = msh->points[index].y;
-        if(msh->max.x < msh->points[index].x) msh->max.x = msh->points[index].x;
-        if(msh->max.y < msh->points[index].y) msh->max.y = msh->points[index].y;
+        if(msh->min.x > p.x) msh->min.x = p.x;
+        if(msh->min.y > p.y) msh->min.y = p.y;
+        if(msh->max.x < p.x) msh->max.x = p.x;
+        if(msh->max.y < p.y) msh->max.y = p.y;
 
     }
     fclose(f);
@@ -105,7 +105,7 @@ mesh* mesh_load(char* name) {
 
     // TRIANGLES //
     
-    sprintf(file_name, "../mesh/%s.1.ele", name);
+    sprintf(file_name, "mesh/%s.1.ele", name);
     printf("\tLoad triangles %s",file_name);
     
     f = fopen(file_name,"r");
@@ -113,12 +113,12 @@ mesh* mesh_load(char* name) {
     
     // get header    
     read = getline(&line, &len, f);
-    msh->triangles_count = atoi(line);
-    printf("count: %d\n", msh->triangles_count);
-    msh->triangles = malloc(msh->triangles_count * sizeof(tri));
+    int triangles_count = atoi(line);
+    printf("count: %d\n", triangles_count);
+
     index = -1;
     i = 0;
-    while(i++ < msh->triangles_count && (read = getline(&line, &len, f)) != -1) {
+    while(i++ < triangles_count && (read = getline(&line, &len, f)) != -1) {
         char* t;
         // get index
         t = strtok(line, " ");
@@ -151,8 +151,6 @@ error:
 
 void mesh_save_ply(mesh* msh, double lng, double lat, double zoom) {
         
-    if(msh->triangles == NULL) return;
-
     FILE* f = fopen("mesh.ply", "w");
     
     if(f == NULL) { printf("Can't open file\n"); return; }
@@ -161,26 +159,26 @@ void mesh_save_ply(mesh* msh, double lng, double lat, double zoom) {
     fprintf(f, "format ascii 1.0\n");
     fprintf(f, "comment PROJ: +proj=laea +lat_0=%f +lon_0=%f +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs\n",lat,lng);
     fprintf(f, "comment ZOOM: %f\n", zoom);
-    fprintf(f, "element vertex %d\n", msh->points_count);
+    fprintf(f, "element vertex %zu\n", msh->points.n);
     fprintf(f, "property float x\n");
     fprintf(f, "property float y\n");
     fprintf(f, "property float z\n");
-    fprintf(f, "element face %d\n", msh->triangles_count);
+    fprintf(f, "element face %zu\n", msh->triangles.n);
     fprintf(f, "property list uchar int vertex_indices\n");
     fprintf(f, "end_header\n");
 
-    for(int i=0; i<msh->points_count   ; i++) 
+    for(int i=0; i<msh->points.n   ; i++) 
         fprintf(f, 
             "%f %f %f\n", 
-            msh->points[i].x, 
-            msh->points[i].y, 
+            kv_A(msh->points,i).x, 
+            kv_A(msh->points,i).y, 
             0.0);
 
-    for(int i=0; i<msh->triangles_count; i++) 
+    for(int i=0; i<msh->triangles.n; i++) 
         fprintf(f, "3 %d %d %d\n", 
-            msh->triangles[i].a, 
-            msh->triangles[i].b,
-            msh->triangles[i].c);
+            kv_A(msh->triangles,i).a, 
+            kv_A(msh->triangles,i).b,
+            kv_A(msh->triangles,i).c);
 
     fclose(f);    
 }

@@ -11,7 +11,7 @@
 void shapes_save_poly(shapes* shp, int shape_id, double zoom) {
     
     char file_name[256];
-    sprintf(file_name, "../mesh/%s.poly", shp->name_long[shape_id]);
+    sprintf(file_name, "mesh/%s.poly", shp->name_long[shape_id]);
 
     FILE* f = fopen(file_name, "w");
     if(f == NULL) { printf("Can't write file\n%s\n",file_name); return; }
